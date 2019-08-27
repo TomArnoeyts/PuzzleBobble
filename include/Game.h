@@ -1,10 +1,16 @@
 #ifndef GAME_H
 #define GAME_H
 #include <Configuration.h>
+#include <StdAngle.h>
+
 #include <SFML/Graphics.hpp>
+
 #include <World.h>
 #include <iostream>
 #include <Balloon.h>
+
+#include <strstream>
+
 class Game
 {
     public:
@@ -39,6 +45,11 @@ class Game
         sf::Time rotateTimer=sf::Time::Zero;
 
         sf::Sprite sprtCartoon;
+
+        Balloon* balReadyToLaunch;
+
+        sf::Text txtScore;
+
 };
 
 #endif // GAME_H

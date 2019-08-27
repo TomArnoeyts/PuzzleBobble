@@ -39,6 +39,7 @@ void Configuration::initTextures()
 
     resVarious.acquire("Rotator", thor::Resources::fromFile<sf::Texture>("resources/various/Rotator.png"));
     resVarious.acquire("Cartoon", thor::Resources::fromFile<sf::Texture>("resources/various/Cartoon.png"));
+    resVarious.acquire("Explosion", thor::Resources::fromFile<sf::Texture>("resources/various/Explosion.png"));
 }
 
 void Configuration::releaseTextures()
@@ -55,6 +56,8 @@ void Configuration::releaseTextures()
     resEntities.release("YellowBalloon");
 
     resVarious.release("Rotator");
+    resVarious.release("Cartoon");
+    resVarious.release("Explosion");
 }
 
 void Configuration::initSounds()
@@ -69,11 +72,11 @@ void Configuration::releaseSounds()
 
 void Configuration::initFonts()
 {
-    //resFonts.acquire("Demonized", thor::Resources::fromFile<sf::Font>("resources/fonts/Demonized.ttf"));
+    resFonts.acquire("InGameFont", thor::Resources::fromFile<sf::Font>("resources/fonts/04B_30__.ttf"));
 }
 
 void Configuration::releaseFonts()
 {
-   // resFonts.release("Demonized");
+    resFonts.release("InGameFont");
 }
 

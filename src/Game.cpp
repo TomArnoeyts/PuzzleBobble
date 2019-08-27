@@ -51,7 +51,14 @@ void Game::processEvents()
 
         switch (_GameState)
         {
-            default:
+        case GameState::Playing:
+            if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code==sf::Keyboard::Space)
+                    balReadyToLaunch->releaseBalloon(StdAngle::CalculateStdAngle(sprtRotator.getRotation()));
+            }
+            break;
+        default:
                 break;
         }
     }
@@ -68,6 +75,7 @@ void Game::processEvents()
                 rotateRotator(direction::Right);
                 rotateTimer=sf::seconds(0.025);
             }
+
             break;
         default:
             break;
@@ -75,12 +83,63 @@ void Game::processEvents()
 }
 void Game::update(sf::Time deltaTime)
 {
+    std::stringstream ssScore;
     switch (_GameState)
     {
 
         case GameState::Playing:
             if (rotateTimer>sf::Time::Zero)
                 rotateTimer-=deltaTime;
+            _world->update(deltaTime);
+
+            if (_world->bBalloonLocked)
+            {
+                 std::string BalloonType;
+
+                int r=rand() % 8;
+
+                switch (r)
+                {
+                case 0:
+                    BalloonType="BlackBalloon";
+                    break;
+                case 1:
+                    BalloonType="BlueBalloon";
+                    break;
+                case 2:
+                    BalloonType="CyanBalloon";
+                    break;
+                case 3:
+                    BalloonType="GreenBalloon";
+                    break;
+                case 4:
+                    BalloonType="PurpleBalloon";
+                    break;
+                case 5:
+                    BalloonType="RedBalloon";
+                    break;
+                case 6:
+                    BalloonType="WhiteBalloon";
+                    break;
+                case 7:
+                    BalloonType="YellowBalloon";
+                    break;
+
+                }
+
+                BalloonType="YellowBalloon";
+                Balloon* b=new Balloon(BalloonType, *_world);
+                b->setPosition(sprtRotator.getPosition());
+                b->_sprite.setOrigin(16,16);
+                _world->addBalloon(b);
+                balReadyToLaunch=b;
+                _world->bBalloonLocked=false;
+            }
+
+
+
+            ssScore << "Score: " << _world->iScore;
+            txtScore.setString(ssScore.str());
             break;
         default:
             break;
@@ -105,6 +164,7 @@ void Game::render()
         }
         _window.draw(*_world);
         _window.draw(sprtRotator);
+        _window.draw(txtScore);
         break;
     default:
         break;
@@ -163,11 +223,11 @@ void Game::initGame()
             (*backgroundSprites[i][j]).setScale(0.375,0.375);
         }
     }
-    Balloon* b=new Balloon("RedBalloon", *_world);
-    b->setPosition(sprtRotator.getPosition());
-    b->_sprite.setOrigin(16,16);
-    _world->addBalloon(b);
-
+    txtScore.setCharacterSize(24);
+    txtScore.setPosition(20,20);
+    txtScore.setFillColor(sf::Color::Black);
+    txtScore.setFont(Configuration::resFonts["InGameFont"]);
+    txtScore.setString("Score: 0");
 }
 
 void Game::rotateRotator(direction dir)
@@ -204,5 +264,5 @@ void Game::rotateRotator(direction dir)
 
     }
 
-    std::cout << sprtRotator.getRotation() << std::endl;
+   // std::cout << sprtRotator.getRotation() << std::endl;
 }

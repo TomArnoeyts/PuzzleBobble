@@ -3,6 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <World.h>
 #include <Configuration.h>
+#include <iostream>
+#include <Thor/Animations.hpp>
 class World;
 class Balloon : public sf::Drawable
 {
@@ -16,16 +18,24 @@ class Balloon : public sf::Drawable
 		void setPosition(Args&& ... args)
 		{
 			_sprite.setPosition(std::forward<Args>(args)...);
+			txtScore.setPosition(std::forward<Args>(args)...);
 		}
 
 		virtual bool isAlive()const;
 
         virtual void update(sf::Time deltaTime);
         virtual void processEvents();
-		virtual void onDestroy();
+		virtual void onPopTheBalloon(bool bScoreCounts);
 
 		sf::Sprite _sprite;
 
+		enum enBalloonType {Black, Blue, Cyan, Green, Purple, Red, White, Yellow};
+
+		enBalloonType myBalloonType;
+
+		void releaseBalloon(float LaunchedAngle);
+
+		bool bIsReleased=false;
 
     protected:
         World& _world;
@@ -34,6 +44,23 @@ class Balloon : public sf::Drawable
     private:
 
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
+
+        int iMoveSpeed=500;
+
+
+        float fLaunchedAngle;
+
+        int iMultiplierX=1;
+
+        thor::FrameAnimation animExplosion;
+
+        thor::Animator<sf::Sprite, std::string> animator;
+
+        sf::Time tmrExplosion=sf::seconds(2);
+
+        bool bIsExploding=false;
+
+        sf::Text txtScore;
 };
 
 #endif // ENTITY_H

@@ -1,5 +1,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
+#include <time.h>
+#include <stdlib.h>
 #include <Thor/Resources.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>

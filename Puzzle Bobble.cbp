@@ -32,6 +32,7 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-std=c++11" />
 			<Add option="-fexceptions" />
 			<Add directory="../SFML/SFML-2.5.1/include" />
 			<Add directory="../thor-v2.0-sdk/include" />
@@ -49,11 +50,13 @@
 		<Unit filename="include/Balloon.h" />
 		<Unit filename="include/Configuration.h" />
 		<Unit filename="include/Game.h" />
+		<Unit filename="include/StdAngle.h" />
 		<Unit filename="include/World.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Balloon.cpp" />
 		<Unit filename="src/Configuration.cpp" />
 		<Unit filename="src/Game.cpp" />
+		<Unit filename="src/StdAngle.cpp" />
 		<Unit filename="src/World.cpp" />
 		<Extensions>
 			<code_completion />
