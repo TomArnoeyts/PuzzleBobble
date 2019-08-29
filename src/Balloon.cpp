@@ -92,7 +92,7 @@ void Balloon::onPopTheBalloon(bool bScoreCounts)
     {
         if (!bIsExploding)
             _world.iScore+=10;
-        std::cout << _world.iScore;
+
         _sprite.setTexture(Configuration::resVarious["Explosion"]);
 
         bIsExploding=true;

@@ -55,7 +55,8 @@ void Game::processEvents()
             if (event.type == sf::Event::KeyPressed)
             {
                 if (event.key.code==sf::Keyboard::Space)
-                    balReadyToLaunch->releaseBalloon(StdAngle::CalculateStdAngle(sprtRotator.getRotation()));
+                    if (balReadyToLaunch)
+                        balReadyToLaunch->releaseBalloon(StdAngle::CalculateStdAngle(sprtRotator.getRotation()));
             }
             break;
         default:
@@ -94,46 +95,7 @@ void Game::update(sf::Time deltaTime)
 
             if (_world->bBalloonLocked)
             {
-                 std::string BalloonType;
-
-                int r=rand() % 8;
-
-                switch (r)
-                {
-                case 0:
-                    BalloonType="BlackBalloon";
-                    break;
-                case 1:
-                    BalloonType="BlueBalloon";
-                    break;
-                case 2:
-                    BalloonType="CyanBalloon";
-                    break;
-                case 3:
-                    BalloonType="GreenBalloon";
-                    break;
-                case 4:
-                    BalloonType="PurpleBalloon";
-                    break;
-                case 5:
-                    BalloonType="RedBalloon";
-                    break;
-                case 6:
-                    BalloonType="WhiteBalloon";
-                    break;
-                case 7:
-                    BalloonType="YellowBalloon";
-                    break;
-
-                }
-
-                BalloonType="YellowBalloon";
-                Balloon* b=new Balloon(BalloonType, *_world);
-                b->setPosition(sprtRotator.getPosition());
-                b->_sprite.setOrigin(16,16);
-                _world->addBalloon(b);
-                balReadyToLaunch=b;
-                _world->bBalloonLocked=false;
+                 setNextBalloon();
             }
 
 
@@ -228,6 +190,8 @@ void Game::initGame()
     txtScore.setFillColor(sf::Color::Black);
     txtScore.setFont(Configuration::resFonts["InGameFont"]);
     txtScore.setString("Score: 0");
+    setNextBalloon();
+    setNextBalloon();
 }
 
 void Game::rotateRotator(direction dir)
@@ -265,4 +229,54 @@ void Game::rotateRotator(direction dir)
     }
 
    // std::cout << sprtRotator.getRotation() << std::endl;
+
+}
+
+
+void Game::setNextBalloon()
+{
+    std::string BalloonType;
+
+    int r=rand() % 8;
+
+    switch (r)
+    {
+    case 0:
+        BalloonType="BlackBalloon";
+        break;
+    case 1:
+        BalloonType="BlueBalloon";
+        break;
+    case 2:
+        BalloonType="CyanBalloon";
+        break;
+    case 3:
+        BalloonType="GreenBalloon";
+        break;
+    case 4:
+        BalloonType="PurpleBalloon";
+        break;
+    case 5:
+        BalloonType="RedBalloon";
+        break;
+    case 6:
+        BalloonType="WhiteBalloon";
+        break;
+    case 7:
+        BalloonType="YellowBalloon";
+        break;
+
+    }
+
+
+    Balloon* b=new Balloon(BalloonType, *_world);
+    b->setPosition(sprtRotator.getPosition().x-64, sprtRotator.getPosition().y);
+    b->_sprite.setOrigin(16,16);
+
+    balReadyToLaunch=balNextBalloon;
+    if (balReadyToLaunch)
+        balReadyToLaunch->setPosition(sprtRotator.getPosition());
+    balNextBalloon=b;
+    _world->addBalloon(b);
+    _world->bBalloonLocked=false;
 }

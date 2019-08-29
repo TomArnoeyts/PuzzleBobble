@@ -39,6 +39,10 @@ class World:public sf::Drawable
         void checkTriplesOrMore();
 
         void removeFreeBalloons();
+
+        void lockBalloon(Balloon* b, int myXPos, int myYPos);
+
+        bool bHaveToLock(int XPos, int YPos);
 };
 
 #endif // WORLD_H

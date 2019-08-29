@@ -18,7 +18,8 @@ class Balloon : public sf::Drawable
 		void setPosition(Args&& ... args)
 		{
 			_sprite.setPosition(std::forward<Args>(args)...);
-			txtScore.setPosition(std::forward<Args>(args)...);
+			if (!bIsExploding)
+                txtScore.setPosition(std::forward<Args>(args)...);
 		}
 
 		virtual bool isAlive()const;
@@ -36,6 +37,10 @@ class Balloon : public sf::Drawable
 		void releaseBalloon(float LaunchedAngle);
 
 		bool bIsReleased=false;
+
+		int myXPos=0, myYPos=0;
+
+		bool bIsExploding=false;
 
     protected:
         World& _world;
@@ -57,8 +62,6 @@ class Balloon : public sf::Drawable
         thor::Animator<sf::Sprite, std::string> animator;
 
         sf::Time tmrExplosion=sf::seconds(2);
-
-        bool bIsExploding=false;
 
         sf::Text txtScore;
 };

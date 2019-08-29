@@ -13,7 +13,7 @@ World::~World()
 void World::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     for (Balloon* b : _balloons)
-        _window.draw(*b);
+       _window.draw(*b);
 }
 
 void World::addBalloon(Balloon* b)
@@ -26,118 +26,100 @@ void World::update(sf::Time dt)
     for (Balloon* b : _balloons)
     {
         b->update(dt);
+
         if (b->bIsReleased)
         {
-            int currentX, currentY;
-            currentX=(b->_sprite.getPosition().x-160) / 48;//Verschuiven?
-            currentY=(b->_sprite.getPosition().y-64) / 48;
-
-            std::cout << "X=" << currentX << " Y=" << currentY << std::endl;
-
-            bool bHaveToLock=false;
-
-            if (currentY==1)
+            int currentY=(int)(b->_sprite.getPosition().y-64+24)/48;
+            if (b->_sprite.getPosition().y-(((currentY+1)*48)+64-24)<2)
             {
-                if (balloonGrid[0][currentX-1]||balloonGrid[0][currentX])
-                {
-                    balloonGrid[1][currentX]=b;
-                }
-                else
-                {
-                    if (balloonGrid[0][currentX])
-                        balloonGrid[0][currentX+1]=b;
-                    else
-                        balloonGrid[0][currentX]=b;
-                }
-                bHaveToLock=true;
-            }
-            else
-            {
-
+                int currentX=0;
                 if (currentY % 2 == 0)
                 {
-                    if (currentX==0)
-                    {
-                        if (balloonGrid[currentY-1][0])
-                        {
-                            balloonGrid[currentY][0]=b;
-                            bHaveToLock=true;
-                        }
 
-                    }
-                    else if (currentX==7)
-                    {
-                        if (balloonGrid[currentY-1][6])
-                        {
-                            balloonGrid[currentY][7]=b;
-                            bHaveToLock=true;
-                        }
+                    currentX=(int)(b->_sprite.getPosition().x-160-24)/48;
+                   /* float diff1=160 + 24 + currentX*48 - ((b->_sprite.getPosition().x -160-24)/48);
 
-                    }
-                    else
-                    {
-                        if (balloonGrid[currentY-1][currentX-1] || balloonGrid[currentY-1][currentX])
-                        {
-                            balloonGrid[currentY][currentX]=b;
-                            bHaveToLock=true;
-                        }
-                    }
+                    if (diff1>2)
+                        currentX++;*/
+
                 }
                 else
                 {
-                    if (currentX==0)
-                    {
-                        if (balloonGrid[currentY-1][0])
-                        {
-                            balloonGrid[currentY][0]=b;
-                            bHaveToLock=true;
-                        }
+                    currentX=(int)(b->_sprite.getPosition().x-160)/48;
+                    /*float diff1=160 + currentX*48 - ((b->_sprite.getPosition().x -160)/48);
 
-                    }
-                    else if (currentX==7)
-                    {
-                        if (balloonGrid[currentY-1][7])
-                        {
-                            balloonGrid[currentY][6]=b;
-                            bHaveToLock=true;
-                        }
+                    if (diff1<2)
+                        currentX--;*/
+                }
 
+                if (currentY==0)
+                {
+                    if (balloonGrid[0][currentX])
+                    {
+                        lockBalloon(b, currentX+1, 0);
                     }
                     else
                     {
-                        if (balloonGrid[currentY-1][currentX] || balloonGrid[currentY-1][currentX+1])
-                        {
-                            bHaveToLock=true;
-                            balloonGrid[currentY][currentX]=b;
-                        }
+                        lockBalloon(b, currentX, 0);
+                    }
 
+                }
+                else
+                {
+                    if (bHaveToLock(currentX, currentY))
+                    {
+                        if (currentY % 2 == 0)
+                            lockBalloon(b, currentX, currentY);
+                        else
+                            lockBalloon(b, currentX-1, currentY);
                     }
                 }
-            }
-            if (bHaveToLock)
-            {
-
-                setBalloonPositions();
-
-                b->bIsReleased=false;
-
-                bBalloonLocked=true;
-
-                checkTriplesOrMore();
-
-                removeFreeBalloons();
             }
         }
     }
 
+    setBalloonPositions();
+
+    checkTriplesOrMore();
+
+    removeFreeBalloons();
     //Haal de slechte ervan tussen:
     for (Balloon* b:_balloons)
     {
         if (!b->isAlive())
+        {
+            balloonGrid[b->myYPos][b->myXPos]=nullptr;
             _balloons.remove(b);
+            delete b;
+        }
+
     }
 }
+void World::lockBalloon(Balloon* b, int myXPos, int myYPos)
+{
+    b->myXPos=myXPos;
+    b->myYPos=myYPos;
 
+    if (balloonGrid[myYPos][myXPos])
+    {
+        if (myYPos % 2 == 0)
+        {
+            lockBalloon(b, myXPos-1, myYPos);
+            return;
+        }
+        else
+        {
+            lockBalloon(b, myXPos+1, myYPos);
+            return;
+        }
+    }
+    else
+        balloonGrid[myYPos][myXPos]=b;
+
+    b->bIsReleased=false;
+
+    bBalloonLocked=true;
+}
 void World::initBalloonGrid()
 {
     balloonGrid=new Balloon**[10];
@@ -173,12 +155,16 @@ void World::checkTriplesOrMore()
         {
             if (balloonGrid[y][x] && balloonGrid[y][x+1] && balloonGrid[y][x+2])
             {
-                if ((balloonGrid[y][x])->myBalloonType == (balloonGrid[y][x+1])->myBalloonType && (balloonGrid[y][x])->myBalloonType == (balloonGrid[y][x+2])->myBalloonType)
-                {
-                    (balloonGrid[y][x])->onPopTheBalloon(true);
-                    (balloonGrid[y][x+1])->onPopTheBalloon(true);
-                    (balloonGrid[y][x+2])->onPopTheBalloon(true);
-                }
+                if (!balloonGrid[y][x]->bIsExploding && !balloonGrid[y][x+1]->bIsExploding && !balloonGrid[y][x+2]->bIsExploding)
+                    if ((balloonGrid[y][x])->myBalloonType == (balloonGrid[y][x+1])->myBalloonType && (balloonGrid[y][x])->myBalloonType == (balloonGrid[y][x+2])->myBalloonType)
+                    {
+                        if (!balloonGrid[y][x]->bIsExploding)
+                            (balloonGrid[y][x])->onPopTheBalloon(true);
+                        if (!balloonGrid[y][x+1]->bIsExploding)
+                            (balloonGrid[y][x+1])->onPopTheBalloon(true);
+                        if (!balloonGrid[y][x+2]->bIsExploding)
+                            (balloonGrid[y][x+2])->onPopTheBalloon(true);
+                    }
             }
         }
     }
@@ -208,4 +194,51 @@ void World::removeFreeBalloons()
 {
 
 
+}
+bool World::bHaveToLock(int XPos, int YPos)
+{
+    if (YPos==0)
+        return true;
+    if (YPos % 2 == 0)
+    {
+        if (XPos==0)
+        {
+            if (balloonGrid[YPos-1][XPos])
+                if (!balloonGrid[YPos-1][XPos]->bIsExploding)
+                    return true;
+        }
+        else
+        {
+            if (balloonGrid[YPos-1][XPos-1])
+            {
+                if (balloonGrid[YPos-1][XPos-1])
+                    if (!balloonGrid[YPos-1][XPos-1]->bIsExploding)
+                        return true;
+
+            }
+
+        }
+    }
+
+    if (YPos % 2 == 1)
+    {
+        if (XPos==7)
+        {
+            if (balloonGrid[YPos-1][XPos])
+                if (!balloonGrid[YPos-1][XPos]->bIsExploding)
+                    return true;
+        }
+        else
+        {
+            if (balloonGrid[YPos-1][XPos] )
+            {
+                if (balloonGrid[YPos-1][XPos])
+                    if (!balloonGrid[YPos-1][XPos]->bIsExploding)
+                        return true;
+
+            }
+        }
+    }
+
+    return false;
 }

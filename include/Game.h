@@ -46,9 +46,13 @@ class Game
 
         sf::Sprite sprtCartoon;
 
-        Balloon* balReadyToLaunch;
+        Balloon* balReadyToLaunch = nullptr;
+
+        Balloon* balNextBalloon = nullptr;
 
         sf::Text txtScore;
+
+        void setNextBalloon();
 
 };
 
