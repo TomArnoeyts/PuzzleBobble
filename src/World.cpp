@@ -84,16 +84,25 @@ void World::update(sf::Time dt)
 
     removeFreeBalloons();
     //Haal de slechte ervan tussen:
-    for (Balloon* b:_balloons)
-    {
-        if (!b->isAlive())
-        {
-            balloonGrid[b->myYPos][b->myXPos]=nullptr;
-            _balloons.remove(b);
-            delete b;
-        }
 
+
+
+    for (int y=0; y<10; y++)
+    {
+        for (int x=0; x<8; x++)
+        {
+            if (balloonGrid[y][x])
+            {
+                if (!balloonGrid[y][x]->isAlive())
+                {
+                    _balloons.remove(balloonGrid[y][x]);
+                    delete balloonGrid[y][x];
+                    balloonGrid[y][x]=nullptr;
+                }
+            }
+        }
     }
+
 }
 void World::lockBalloon(Balloon* b, int myXPos, int myYPos)
 {
@@ -168,6 +177,89 @@ void World::checkTriplesOrMore()
             }
         }
     }
+
+    //Check 2+1:
+
+    for (int y=0; y<10; y++)
+    {
+        for (int x=0; x<7; x++)
+        {
+            if (y % 2 == 0)
+            {
+                if (balloonGrid[y][x] && balloonGrid[y][x+1] && balloonGrid[y+1][x])
+                {
+                    if (balloonGrid[y][x]->myBalloonType==balloonGrid[y][x+1]->myBalloonType && balloonGrid[y][x+1]->myBalloonType==balloonGrid[y+1][x]->myBalloonType)
+                    {
+                        if (!balloonGrid[y][x]->bIsExploding)
+                            (balloonGrid[y][x])->onPopTheBalloon(true);
+                        if (!balloonGrid[y][x+1]->bIsExploding)
+                            (balloonGrid[y][x+1])->onPopTheBalloon(true);
+                        if (!balloonGrid[y+1][x]->bIsExploding)
+                            (balloonGrid[y+1][x])->onPopTheBalloon(true);
+                    }
+                }
+            }
+            else
+            {
+                if (balloonGrid[y][x] && balloonGrid[y][x+1] && balloonGrid[y+1][x+1])
+                {
+                    if (balloonGrid[y][x]->myBalloonType==balloonGrid[y][x+1]->myBalloonType && balloonGrid[y][x+1]->myBalloonType==balloonGrid[y+1][x+1]->myBalloonType)
+                    {
+                        if (!balloonGrid[y][x]->bIsExploding)
+                            (balloonGrid[y][x])->onPopTheBalloon(true);
+                        if (!balloonGrid[y][x+1]->bIsExploding)
+                            (balloonGrid[y][x+1])->onPopTheBalloon(true);
+                        if (!balloonGrid[y+1][x+1]->bIsExploding)
+                            (balloonGrid[y+1][x+1])->onPopTheBalloon(true);
+                    }
+                }
+            }
+        }
+    }
+
+    //Check 1+2:
+    for (int y=0; y<10; y++)
+    {
+        for (int x=0; x<8; x++)
+        {
+            if (y%2==0)
+            {
+                if (x!=0)
+                {
+                    if (balloonGrid[y][x] && balloonGrid[y+1][x] && balloonGrid[y+1][x-1])
+                    {
+                        if (balloonGrid[y][x]->myBalloonType==balloonGrid[y+1][x]->myBalloonType && balloonGrid[y+1][x]->myBalloonType==balloonGrid[y+1][x-1]->myBalloonType)
+                        {
+                            if (!balloonGrid[y][x]->bIsExploding)
+                                (balloonGrid[y][x])->onPopTheBalloon(true);
+                            if (!balloonGrid[y+1][x]->bIsExploding)
+                                (balloonGrid[y+1][x])->onPopTheBalloon(true);
+                            if (!balloonGrid[y+1][x-1]->bIsExploding)
+                                (balloonGrid[y+1][x-1])->onPopTheBalloon(true);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (x!=7)
+                {
+                    if (balloonGrid[y][x] && balloonGrid[y+1][x] && balloonGrid[y+1][x+1])
+                    {
+                        if (balloonGrid[y][x]->myBalloonType==balloonGrid[y+1][x]->myBalloonType && balloonGrid[y+1][x]->myBalloonType==balloonGrid[y+1][x+1]->myBalloonType)
+                        {
+                            if (!balloonGrid[y][x]->bIsExploding)
+                                (balloonGrid[y][x])->onPopTheBalloon(true);
+                            if (!balloonGrid[y+1][x]->bIsExploding)
+                                (balloonGrid[y+1][x])->onPopTheBalloon(true);
+                            if (!balloonGrid[y+1][x+1]->bIsExploding)
+                                (balloonGrid[y+1][x+1])->onPopTheBalloon(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 void World::setBalloonPositions()
 {
@@ -192,8 +284,49 @@ void World::setBalloonPositions()
 }
 void World::removeFreeBalloons()
 {
-
-
+    for (int y=9; y>0; y--)
+    {
+        for (int x=0; x<8; x++)
+        {
+            if (balloonGrid[y][x])
+            {
+                if (y % 2 == 0)
+                {
+                     if (x==0)
+                        {
+                            if (!balloonGrid[y-1][x])
+                            {
+                                balloonGrid[y][x]->onPopTheBalloon(false);
+                            }
+                        }
+                        else
+                        {
+                            if (!balloonGrid[y-1][x] && !balloonGrid[y-1][x-1])
+                            {
+                                balloonGrid[y][x]->onPopTheBalloon(false);
+                            }
+                        }
+                }
+                else
+                {
+                    if (x==7)
+                    {
+                        if (!balloonGrid[y-1][x])
+                        {
+                            balloonGrid[y][x]->onPopTheBalloon(false);
+                        }
+                    }
+                    else
+                    {
+                        if (!balloonGrid[y-1][x+1] && !balloonGrid[y-1][x])
+                        {
+                            balloonGrid[y][x]->onPopTheBalloon(false);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 bool World::bHaveToLock(int XPos, int YPos)
 {
@@ -240,5 +373,74 @@ bool World::bHaveToLock(int XPos, int YPos)
         }
     }
 
+    return false;
+}
+
+void World::parseLevel(std::string strFilename)
+{
+    nlohmann::json j;
+    std::ifstream i(strFilename);
+    i >> j;
+
+    for (nlohmann::json::iterator it = j["balloons"].begin(); it != j["balloons"].end(); ++it) {
+
+        auto balloon=(*it);
+        Balloon* bal=new Balloon(balloon["myColor"].get<std::string>(), *this);
+        bal->myXPos=balloon["myX"].get<int>();
+        bal->myYPos=balloon["myY"].get<int>();
+        bal->_sprite.setOrigin(16,16);
+
+        balloonGrid[bal->myYPos][bal->myXPos]=bal;
+        addBalloon(bal);
+    }
+
+    setBalloonPositions();
+}
+bool World::isColorPresent(std::string testColor)
+{
+    for (int i=0; i<10; i++)
+    {
+        for (int j=0; j<8; j++)
+        {
+            if (balloonGrid[i][j])
+            {
+                switch (balloonGrid[i][j]->myBalloonType)
+                {
+                case Balloon::enBalloonType::Black:
+                    if (!testColor.compare("BlackBalloon"))
+                        return true;
+                    break;
+                case Balloon::enBalloonType::Blue:
+                    if (!testColor.compare("BlueBalloon"))
+                        return true;
+                    break;
+                case Balloon::enBalloonType::Cyan:
+                    if (!testColor.compare("CyanBalloon"))
+                        return true;
+                    break;
+                case Balloon::enBalloonType::Green:
+                    if (!testColor.compare("GreenBalloon"))
+                        return true;
+                    break;
+                case Balloon::enBalloonType::Purple:
+                    if (!testColor.compare("PurpleBalloon"))
+                        return true;
+                    break;
+                case Balloon::enBalloonType::Red:
+                    if (!testColor.compare("RedBalloon"))
+                        return true;
+                    break;
+                case Balloon::enBalloonType::Yellow:
+                    if (!testColor.compare("YellowBalloon"))
+                        return true;
+                    break;
+                case Balloon::enBalloonType::White:
+                    if (!testColor.compare("WhiteBalloon"))
+                        return true;
+                    break;
+                }
+            }
+        }
+    }
     return false;
 }

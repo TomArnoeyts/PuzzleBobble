@@ -73,6 +73,12 @@ void Balloon::update(sf::Time deltaTime)
             _Alive=false;
         }
     }
+    if (bIsFalling)
+    {
+        _sprite.move(0,iMoveSpeed*deltaTime.asSeconds());
+        if (_sprite.getPosition().y>160+(10*48))
+            _Alive=false;
+    }
 }
 
 
@@ -101,7 +107,10 @@ void Balloon::onPopTheBalloon(bool bScoreCounts)
         animator.playAnimation("explode");
     }
     else
-        _Alive = false;
+    {
+        bIsFalling=true;
+    }
+
 }
 
 void Balloon::releaseBalloon(float LaunchedAngle)

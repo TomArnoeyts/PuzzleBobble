@@ -4,6 +4,8 @@
 #include <list>
 #include <Balloon.h>
 #include <iostream>
+#include <nlohmann/json.hpp>
+#include <fstream>
 class Balloon;
 class World:public sf::Drawable
 {
@@ -26,6 +28,10 @@ class World:public sf::Drawable
         bool bBalloonLocked=true;
 
         int iScore=0;
+
+        void parseLevel(std::string strFilename);
+
+        bool isColorPresent (std::string testColor);
     private:
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;//MOET je implementeren om over te erven van sf::Drawable
         sf::RenderWindow& _window;
@@ -43,6 +49,8 @@ class World:public sf::Drawable
         void lockBalloon(Balloon* b, int myXPos, int myYPos);
 
         bool bHaveToLock(int XPos, int YPos);
+
+
 };
 
 #endif // WORLD_H

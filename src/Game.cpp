@@ -119,7 +119,7 @@ void Game::render()
         _window.draw(sprtCartoon);
         for (int i=0;i<10;i++)
         {
-            for (int j=0; j<8; j++)
+            for (int j=0; j<9; j++)
             {
                 _window.draw((*backgroundSprites[i][j]));
             }
@@ -152,8 +152,8 @@ void Game::initGame()
     backgroundSprites=new sf::Sprite**[10];
     for (int i=0;i<10;i++)
     {
-        backgroundSprites[i]=new sf::Sprite*[8];
-        for (int j=0; j<8; j++)
+        backgroundSprites[i]=new sf::Sprite*[9];
+        for (int j=0; j<9; j++)
         {
             backgroundSprites[i][j]=new sf::Sprite();
             if (i % 2 == 1)
@@ -190,6 +190,7 @@ void Game::initGame()
     txtScore.setFillColor(sf::Color::Black);
     txtScore.setFont(Configuration::resFonts["InGameFont"]);
     txtScore.setString("Score: 0");
+    _world->parseLevel("resources/levels/level1.json");
     setNextBalloon();
     setNextBalloon();
 }
@@ -236,38 +237,41 @@ void Game::rotateRotator(direction dir)
 void Game::setNextBalloon()
 {
     std::string BalloonType;
-
-    int r=rand() % 8;
-
-    switch (r)
+    do
     {
-    case 0:
-        BalloonType="BlackBalloon";
-        break;
-    case 1:
-        BalloonType="BlueBalloon";
-        break;
-    case 2:
-        BalloonType="CyanBalloon";
-        break;
-    case 3:
-        BalloonType="GreenBalloon";
-        break;
-    case 4:
-        BalloonType="PurpleBalloon";
-        break;
-    case 5:
-        BalloonType="RedBalloon";
-        break;
-    case 6:
-        BalloonType="WhiteBalloon";
-        break;
-    case 7:
-        BalloonType="YellowBalloon";
-        break;
 
+        int r=rand() % 8;
+
+        switch (r)
+        {
+        case 0:
+            BalloonType="BlackBalloon";
+            break;
+        case 1:
+            BalloonType="BlueBalloon";
+            break;
+        case 2:
+            BalloonType="CyanBalloon";
+            break;
+        case 3:
+            BalloonType="GreenBalloon";
+            break;
+        case 4:
+            BalloonType="PurpleBalloon";
+            break;
+        case 5:
+            BalloonType="RedBalloon";
+            break;
+        case 6:
+            BalloonType="WhiteBalloon";
+            break;
+        case 7:
+            BalloonType="YellowBalloon";
+            break;
+
+        }
     }
-
+    while (!_world->isColorPresent(BalloonType));
 
     Balloon* b=new Balloon(BalloonType, *_world);
     b->setPosition(sprtRotator.getPosition().x-64, sprtRotator.getPosition().y);

@@ -64,6 +64,8 @@ class Balloon : public sf::Drawable
         sf::Time tmrExplosion=sf::seconds(2);
 
         sf::Text txtScore;
+
+        bool bIsFalling=false;
 };
 
 #endif // ENTITY_H

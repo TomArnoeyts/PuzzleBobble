@@ -37,6 +37,7 @@
 			<Add directory="../SFML/SFML-2.5.1/include" />
 			<Add directory="../thor-v2.0-sdk/include" />
 			<Add directory="../Aurora-master/include" />
+			<Add directory="../json-develop/include" />
 		</Compiler>
 		<Linker>
 			<Add library="../SFML/SFML-2.5.1/buildcb/lib/libsfml-audio.a" />
